@@ -1,71 +1,55 @@
-# Домашнее задание к занятию "`8-02_Система_мониторинга_Zabbix`" - `Savin Aleksey`
+# Домашнее задание к занятию «ELK» - `Савин Алексей`
 
-### Задание 1
-Установите Zabbix Server с веб-интерфейсом.
+### Задание 1. Elasticsearch
+Установите и запустите Elasticsearch, после чего поменяйте параметр cluster_name на случайный.  
+Приведите скриншот команды `curl -X GET 'localhost:9200/_cluster/health?pretty'`, сделанной на сервере с установленным Elasticsearch. Где будет виден нестандартный cluster_name.  
 
-***Процесс выполнения***
-1. Выполняя ДЗ, сверяйтесь с процессом отражённым в записи лекции.
-2. Установите PostgreSQL. Для установки достаточна та версия, что есть в системном репозитороии Debian 11.
-3. Пользуясь конфигуратором команд с официального сайта, составьте набор команд для установки последней версии Zabbix с поддержкой PostgreSQL и Apache.
-4. Выполните все необходимые команды для установки Zabbix Server и Zabbix Web Server.
-   
-***Требования к результату***
-
-1. Прикрепите в файл README.md скриншот авторизации в админке.
-2. Приложите в файл README.md текст использованных команд в GitHub.
-
-
-### Решение 1
-![zabbix](https://github.com/AI-Savin/Netology_hw_8.02/blob/main/img/zabbix.png)  
-
- **команды**  
+### Решение 1  
+- Скриншот с командой и результатом ее выполнения
  
- `sudo apt install postgresql`  
- `wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-5+debian12_all.deb`   
- `sudo dpkg -i zabbix-release_6.0-5+debian12_all.deb`  
- `sudo apt update`  
- `sudo apt install zabbix-server-pgsql zabbix-frontend-php php8.2-pgsql zabbix-apache-conf zabbix-sql-scripts`  
- `sudo -u postgres createuser --pwprompt zabbix`  
- `sudo -u postgres createdb -O zabbix zabbix`  
- `zcat /usr/share/zabbix-sql-scripts/postgresql/server.sql.gz | sudo -u zabbix psql zabbix`  
- `sudo nano /etc/zabbix/zabbix_server.conf`  
- `sudo systemctl restart zabbix-server apache2`  
- `sudo systemctl enable zabbix-server apache2`  
- 
+![Elasticsearch](https://github.com/AI-Savin/ELK_hw_netology/blob/main/img/elastic.png)  
+
 ---
 
-### Задание 2
-Установите Zabbix Agent на два хоста.
+### Задание 2. Kibana
+Установите и запустите Kibana.  
+Приведите скриншот интерфейса Kibana на странице http://<ip вашего сервера>:5601/app/dev_tools#/console, где будет выполнен запрос `GET /_cluster/health?pretty`.  
 
-***Процесс выполнения***
-1. Выполняя ДЗ, сверяйтесь с процессом отражённым в записи лекции.
-2. Установите Zabbix Agent на 2 вирт.машины, одной из них может быть ваш Zabbix Server.
-3. Добавьте Zabbix Server в список разрешенных серверов ваших Zabbix Agentов.
-4. Добавьте Zabbix Agentов в раздел Configuration > Hosts вашего Zabbix Servera.
-5. Проверьте, что в разделе Latest Data начали появляться данные с добавленных агентов.
+### Решение 2 
+
+- Скриншот интерфейса Kibana  
    
-***Требования к результату***  
+![kibana](https://github.com/AI-Savin/ELK_hw_netology/blob/main/img/kibana.png) 
 
-1. Приложите в файл README.md скриншот раздела Configuration > Hosts, где видно, что агенты подключены к серверу
-2. Приложите в файл README.md скриншот лога zabbix agent, где видно, что он работает с сервером
-3. Приложите в файл README.md скриншот раздела Monitoring > Latest data для обоих хостов, где видны поступающие от агентов данные.
-4. Приложите в файл README.md текст использованных команд в GitHub 
+---
 
-### Решение 2
+### Задание 3. Logstash
+Установите и запустите Logstash и Nginx. С помощью Logstash отправьте access-лог Nginx в Elasticsearch.  
+Приведите скриншот интерфейса Kibana, на котором видны логи Nginx.  
 
-![zabbix_agents](https://github.com/AI-Savin/Netology_hw_8.02/blob/main/img/zabbix_agents.png)  
-![zabbix_logs_vm2](https://github.com/AI-Savin/Netology_hw_8.02/blob/main/img/log_zabbix_agent_vm2.png)  
-![zabbix_logs_vm3](https://github.com/AI-Savin/Netology_hw_8.02/blob/main/img/log_zabbix_agent_vm3.png)  
-![zabbix_agents_monitor](https://github.com/AI-Savin/Netology_hw_8.02/blob/main/img/zabbix_agents_monitor.png)  
+### Решение 3  
 
-**команды**  
+- Скриншот настройки Logstash
+  
+![Logstash_1](https://github.com/AI-Savin/ELK_hw_netology/blob/main/img/Logstash_1.png)  
 
-`wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-5+debian12_all.deb`  
-`sudo dpkg -i zabbix-release_6.0-5+debian12_all.deb`  
-`sudo apt update`  
-`sudo systemctl status zabbix-agent`  
-`sudo find / -name zabbix_agentd.conf`  
-`sudo sed -i 's/Server=127.0.0.1/Server=192.168.3.9/g' /etc/zabbix/zabbix_agentd.conf`  
-`sudo systemctl restart zabbix-agent`  
-`sudo systemctl status zabbix-agent`  
-`sudo tail -f /var/log/zabbix/zabbix_agentd.log`  
+
+- Скриншот интерфейса Kibana  
+
+![Logstash](https://github.com/AI-Savin/ELK_hw_netology/blob/main/img/Logstash.png)  
+
+---
+
+### Задание 4. Filebeat.
+Установите и запустите Filebeat. Переключите поставку логов Nginx с Logstash на Filebeat.  
+Приведите скриншот интерфейса Kibana, на котором видны логи Nginx, которые были отправлены через Filebeat.  
+
+### Решение 4
+
+- Скриншот настройки Logstash
+
+![Task_4_1](https://github.com/AI-Savin/ELK_hw_netology/blob/main/img/Task_4_1.png)  
+
+- Скриншот интерфейса Kibana
+
+  ![Task_4](https://github.com/AI-Savin/ELK_hw_netology/blob/main/img/Task_4.png)  
